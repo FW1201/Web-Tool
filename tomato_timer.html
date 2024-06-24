@@ -1,0 +1,140 @@
+
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>番茄鐘計時器</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background-color: #f0f0f0;
+            margin: 0;
+        }
+        h1 {
+            color: #333;
+        }
+        .timer, .todo, .tts {
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin: 20px 0;
+            width: 300px;
+            text-align: center;
+        }
+        .button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .button:hover {
+            background: #45a049;
+        }
+        .todo-list {
+            list-style: none;
+            padding: 0;
+        }
+        .todo-item {
+            background: #eee;
+            margin: 5px 0;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .completed {
+            text-decoration: line-through;
+            color: gray;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>番茄鐘計時器</h1>
+    <div class="timer">
+        <div id="time">25:00</div>
+        <button class="button" onclick="startTimer()">開始</button>
+        <button class="button" onclick="resetTimer()">重設</button>
+        <br>
+        <label for="customTime">自定義時間（分鐘）：</label>
+        <input type="number" id="customTime" min="1" max="60" value="25">
+    </div>
+
+    <div class="todo">
+        <h2>待辦事項列表</h2>
+        <input type="text" id="newTodo" placeholder="添加新的待辦事項">
+        <button class="button" onclick="addTodo()">添加</button>
+        <ul class="todo-list" id="todoList"></ul>
+    </div>
+
+    <div class="tts">
+        <h2>文字轉語音</h2>
+        <textarea id="ttsInput" rows="4" placeholder="輸入文字"></textarea>
+        <br>
+        <button class="button" onclick="textToSpeech()">轉換為語音</button>
+    </div>
+
+    <script>
+        let timerInterval;
+        let timeLeft = 25 * 60;
+
+        function updateTimeDisplay() {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            document.getElementById('time').innerText = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        function startTimer() {
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                if (timeLeft > 0) {
+                    timeLeft--;
+                    updateTimeDisplay();
+                } else {
+                    clearInterval(timerInterval);
+                    alert('時間到！');
+                }
+            }, 1000);
+        }
+
+        function resetTimer() {
+            clearInterval(timerInterval);
+            const customTime = parseInt(document.getElementById('customTime').value);
+            timeLeft = customTime * 60;
+            updateTimeDisplay();
+        }
+
+        function addTodo() {
+            const newTodo = document.getElementById('newTodo').value;
+            if (newTodo) {
+                const li = document.createElement('li');
+                li.textContent = newTodo;
+                li.className = 'todo-item';
+                li.onclick = () => li.classList.toggle('completed');
+                document.getElementById('todoList').appendChild(li);
+                document.getElementById('newTodo').value = '';
+            }
+        }
+
+        function textToSpeech() {
+            const text = document.getElementById('ttsInput').value;
+            const msg = new SpeechSynthesisUtterance(text);
+            msg.lang = 'zh-TW';
+            window.speechSynthesis.speak(msg);
+        }
+
+        // Initialize timer display
+        updateTimeDisplay();
+    </script>
+
+</body>
+</html>
